@@ -1,0 +1,19 @@
+.side-menu-container {
+    background-color: lightgrey;
+}
+
+.side-menu-container a:link {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+}
+
+.side-menu-container a:visited {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+}
+
+.side-menu-container .welcome-message {
+    display: grid;
+}
