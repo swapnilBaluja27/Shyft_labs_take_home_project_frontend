@@ -1,106 +1,139 @@
-import {React, useState, useEffect} from 'react';
+import { React, useState, useEffect } from "react";
+import IconButton from "@mui/material/IconButton";
+import CancelIcon from "@mui/icons-material/Cancel";
+import Typography from "@mui/material/Typography";
 
-import './Courses.css';
+import "./Courses.css";
 
 export default function Courses() {
-    // document.title = "Courses"
 
-    // Initialize variables(camelCase) with initial state 
-    const [courseName, setCourseName] = useState("");
-    const [allCourses, setAllCourses] = useState();
+  // initialize the state variables
+  const [courseName, setCourseName] = useState("");
+  const [allCourses, setAllCourses] = useState();
 
-    // GET request for fetching list of students from the database
-    const fetchCourses = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/api/getcourses'); // Since this is a development version and not hosted, we send requests to localhost
-            if (!response.ok) {
-                throw new Error('Error');
-            }
-            const data = await response.json();
-            console.log(data.all_course);
-            setAllCourses(data.all_course);
-            // setAllCourses(data.courses); // Got the courses
-
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-        }
-    };
-    
-    useEffect(() => {
-        fetchCourses(); // Call API only once on page load
-    }, []);
-
-    // Function to run when form is submitted
-    const submitForm = async (e) => {
-        e.preventDefault();
-
-        console.log(`Course Name: ${courseName}`);
-
-        try {
-            const response = await fetch('http://localhost:8000/api/addcourse', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ courseName })
-            });
-        
-            if (!response.ok) {
-                throw new Error('Error');
-            }
-        
-            const data = await response.json();
-
-            // Notification for new addition
-            alert("Course Details inserted");
-            
-            // Clear all form contents
-            clearForm()
-
-            // Refresh the table
-            fetchCourses()
-
-        } catch (error) {
-            alert('Cannot insert course details: ', error);
-        }
-    };
-
-    // Utility function to clear form fields
-    const clearForm = () => {
-        setCourseName("")
+  // GET request for fetching all the courses
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/getcourses");
+      if (!response.ok) {
+        throw new Error("Error");
+      }
+      const data = await response.json();
+      setAllCourses(data.all_course); 
+    } catch (error) {
+      console.error("Error fetching courses:", error);
     }
+  };
+
+  const deleteCourse = async (course_name) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/deletecourse", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ course_name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error");
+      }
+
+      clearForm();
+      fetchCourses();
+      alert("Course Deleted");
+
+    } catch (error) {
+      alert("Cannot delete course: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  // on clicking submit button
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:8000/api/addcourse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ courseName }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error in adding course. Try again.");
+      }
+
+      alert("Course Details added");
+      clearForm();
+      fetchCourses();
+
+    } catch (error) {
+      alert("Error adding course: ", error);
+    }
+  };
+
+  const clearForm = () => {
+    setCourseName("");
+  };
 
   return (
     <>
-    <div className="section-heading">Please fill the form to add a course</div>
-    <form onSubmit={submitForm}>
-      <label>
-        Course Name:
-        <input type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} required/>
-      </label>
-      
-      <button type="submit">Submit</button>
-    </form>
-    {/* Populate the table only if there are available courses*/}
-    { allCourses ?
+      <Typography variant="h5" style={{ marginBottom: "10px" }}>
+        Course Details
+      </Typography>
+      <div>Please add the course using the form below:</div>
+
+      <form onSubmit={submitForm}>
+        <label>
+          Course Name:
+          <input
+            type="text"
+            value={courseName}
+            onChange={(e) => setCourseName(e.target.value)}
+            required
+          />
+        </label>
+
+        <button type="submit">Submit</button>
+      </form>
+
+      {allCourses ? (
         <>
-        <div className="section-heading">Currently available courses</div>
-        <div id="table_container">
+          <div className="section-heading">Course List</div>
+          <div id="table_container">
             <table id="courses_table">
-                <tr>
-                    <th>Course Name</th>
-                </tr>
-                {allCourses.map((c) => {
-                    return(
-                        <tr>
-                            <td>{c}</td>
-                        </tr>
-                    )
-                })}
+              <tr>
+                <th>Course Name</th>
+                <th>Delete</th>
+              </tr>
+              {allCourses.map((c) => {
+                return (
+                  <tr>
+                    <td>{c}</td>
+                    <td>
+                      <IconButton
+                        aria-label="delete"
+                        color="error"
+                        onClick={() => deleteCourse(c)}
+                      >
+                        <CancelIcon />
+                      </IconButton>
+                    </td>
+                  </tr>
+                );
+              })}
             </table>
-        </div>
-        </>: <h2 id="">No Courses</h2> 
-    }
+          </div>
+        </>
+      ) : (
+        <h2 id="">No Courses available</h2>
+      )}
     </>
-  )
+  );
 }

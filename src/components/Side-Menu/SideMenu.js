@@ -20,7 +20,6 @@ const drawerWidth = 240;
 
 export default function SideMenu() {
   return (
-    // <Box sx={{ display: "flex" }} className="side-menu-container">
       <Drawer
         sx={{
           width: drawerWidth,
@@ -83,6 +82,5 @@ export default function SideMenu() {
           </Link>
         </List>
       </Drawer>
-    // </Box>
   );
 }
