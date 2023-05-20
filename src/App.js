@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-// Import all components
 import SideMenu from "./components/Side-Menu/SideMenu";
 import Home from "./components/Home";
 import Students from "./components/Students/Students";
@@ -37,7 +36,7 @@ function App() {
           >
             <ThemeProvider theme={theme}>
               <Typography variant="h3" className="heading">
-                Student Management Portal
+                Student Result Management Portal
               </Typography>
             </ThemeProvider>
             <Routes>
